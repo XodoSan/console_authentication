@@ -19,7 +19,8 @@ public class Tools {
         passwordSymbol == '!' ||
         passwordSymbol == '_' ||
         passwordSymbol == '=' ||
-        passwordSymbol == '%') {
+        passwordSymbol == '%' ||
+        passwordSymbol == ';') {
         specialCharacterCounter++;
       }
     }

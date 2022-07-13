@@ -4,8 +4,20 @@ import com.xodosan.cosole_authentication.Error;
 import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 
+import java.io.IOException;
+
 public class AuthService {
-  public Result registration(User user) {
+  private FileService fileService;
+
+  public AuthService(FileService fileService) {
+    this.fileService = fileService;
+  }
+
+  public Result registration(User user) throws IOException {
+    if (isExist(user.getNickName())) return new Result(false, Error.user_exist);
+    fileService.writeToFile(user);
+
+    System.out.println("Successfully registration!");
     return new Result(true, Error.none);
   }
 
@@ -13,12 +25,9 @@ public class AuthService {
     return new Result(true, Error.none);
   }
 
-  private boolean isExist(String nickName) {
-    //checking in db
-    return true;
-  }
+  private boolean isExist(String nickName) throws IOException {
+    if (fileService.searchUserByNickName(nickName) != null) return true;
 
-  private boolean validatePassword(User user) {
-    return true;
+    return false;
   }
 }
