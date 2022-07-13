@@ -1,4 +1,4 @@
-package pojo;
+package com.xodosan.cosole_authentication.pojo;
 
 public class User {
   private String nickName;

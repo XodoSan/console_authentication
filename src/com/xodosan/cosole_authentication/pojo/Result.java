@@ -1,11 +1,13 @@
-package pojo;
+package com.xodosan.cosole_authentication.pojo;
+
+import com.xodosan.cosole_authentication.Error;
 
 public class Result {
   private boolean result;
 
-  private String error;
+  private Error error;
 
-  public Result(boolean result, String error) {
+  public Result(boolean result, Error error) {
     this.result = result;
     this.error = error;
   }
@@ -18,11 +20,11 @@ public class Result {
     this.result = result;
   }
 
-  public String getError() {
+  public Error getError() {
     return error;
   }
 
-  public void setError(String error) {
+  public void setError(Error error) {
     this.error = error;
   }
 }
