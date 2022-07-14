@@ -20,7 +20,7 @@ public class Main {
   Scanner in = new Scanner(System.in);
 
   public static void main(String[] args) throws IOException {
-    Main mainMenu = new Main(new AuthService(new FileService()), new Tools());
+    Main mainMenu = new Main(new AuthService(new FileService(), new Tools()), new Tools());
 
     mainMenu.showMenu();
   }
@@ -40,17 +40,25 @@ public class Main {
     }
   }
 
-  private void relocated(String command) throws IOException { //system relocated in main menu
+  private void relocated(String command) throws IOException {
     switch (command) {
       case ("sign up"):
         System.out.print("Enter your nickname: ");
         String nickName = in.nextLine();
-        System.out.println("Enter your password: ");
+        System.out.print("Enter your password: ");
         String password = in.nextLine();
+        System.out.print("Repeat your password: ");
+        String repeatedPassword = in.nextLine();
 
-        Result result = tools.validatePassword(password);
-        if (!result.isResult()) {
-          System.out.println(result.getError());
+        Result compareResult = tools.isPasswordsEqual(password, repeatedPassword);
+        if (!compareResult.isResult()) {
+          System.out.println("User not added, reason: " + compareResult.getError());
+          return;
+        }
+
+        Result validateResult = tools.validatePassword(password);
+        if (!validateResult.isResult()) {
+          System.out.println(validateResult.getError());
           return;
         }
 
@@ -65,7 +73,7 @@ public class Main {
       case ("exit"):
         System.exit(1);
       default:
-        System.out.println("unexpected command");
+        System.out.println(Error.UNEXPECTED_COMMAND);
         break;
     }
   }
