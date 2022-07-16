@@ -26,7 +26,14 @@ public class AuthService {
     return new Result(true, Error.NONE);
   }
 
-  public Result login(User user) {
+  public Result login(User user) throws IOException {
+    if (!isExist(user.getNickName())) return new Result(false, Error.USER_NOT_EXIST);
+
+    User thisUser = fileService.searchUserByNickName(user.getNickName());
+    if (!thisUser.getPassword().equals(tools.stringHashing(user.getPassword())))
+      return new Result(false, Error.WRONG_PASSWORD);
+    System.out.println("Successfully login!");
+
     return new Result(true, Error.NONE);
   }
 

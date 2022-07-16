@@ -1,5 +1,6 @@
 package com.xodosan.cosole_authentication;
 
+import com.xodosan.cosole_authentication.menu.AfterAccountEntryMenu;
 import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
@@ -11,30 +12,30 @@ import java.util.Scanner;
 public class Main {
   private static AuthService authService;
   private static Tools tools;
+  private static AfterAccountEntryMenu afterAccountEntryMenu;
 
-  public Main(AuthService authService, Tools tools) {
+  public Main(AuthService authService, Tools tools, AfterAccountEntryMenu afterAccountEntryMenu) {
     this.authService = authService;
     this.tools = tools;
+    this.afterAccountEntryMenu = afterAccountEntryMenu;
   }
 
-  Scanner in = new Scanner(System.in);
+  public Scanner in = new Scanner(System.in);
 
   public static void main(String[] args) throws IOException {
-    Main mainMenu = new Main(new AuthService(new FileService(), new Tools()), new Tools());
+    Main mainMenu = new Main(new AuthService(new FileService(), new Tools()), new Tools(), new AfterAccountEntryMenu());
 
-    mainMenu.showMenu();
+    mainMenu.showMainMenu();
   }
 
-  public void showMenu() throws IOException {
-    String command;
-
+  public void showMainMenu() throws IOException {
     while (true) {
       System.out.println("Please enter a command");
       System.out.println("Registration - sign up");
       System.out.println("Login - sign in");
       System.out.println("Exit - exit");
 
-      command = in.nextLine();
+      String command = in.nextLine();
 
       relocated(command);
     }
@@ -69,6 +70,17 @@ public class Main {
 
         break;
       case ("sign in"):
+        System.out.print("Enter your nickname: ");
+        nickName = in.nextLine();
+        System.out.print("Enter your password: ");
+        password = in.nextLine();
+
+        User user = new User(nickName, password);
+        Result logResult = authService.login(user);
+
+        if (logResult.isResult()) afterAccountEntryMenu.showLoginMenu(user);
+        else System.out.println("Invalid login, reason: " + logResult.getError());
+
         break;
       case ("exit"):
         System.exit(1);
