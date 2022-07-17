@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class FileService {
+  private final File file = new File("C:\\Users\\Андрей\\IdeaProjects\\console_authentication\\db.txt");
   private final String DBName = "db.txt";
 
   public void writeToFile(User user) throws IOException {
@@ -17,6 +18,20 @@ public class FileService {
     writer.append("\n");
 
     writer.close();
+  }
+
+  public void replacePassword(User user) throws IOException {
+    ArrayList<User> users = getAllUsers();
+    file.delete();
+    file.createNewFile();
+
+    for (int i = 0; i < users.size(); i++) {
+      if (users.get(i).getNickName().equals(user.getNickName())) {
+        users.get(i).setPassword(user.getPassword());
+      }
+
+      writeToFile(users.get(i));
+    }
   }
 
   public User searchUserByNickName(String nickName) throws IOException {

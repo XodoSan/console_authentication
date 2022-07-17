@@ -1,6 +1,6 @@
 package com.xodosan.cosole_authentication;
 
-import com.xodosan.cosole_authentication.menu.AfterAccountEntryMenu;
+import com.xodosan.cosole_authentication.menu.AccountMenu;
 import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
@@ -12,18 +12,20 @@ import java.util.Scanner;
 public class Main {
   private static AuthService authService;
   private static Tools tools;
-  private static AfterAccountEntryMenu afterAccountEntryMenu;
+  private static AccountMenu accountMenu;
 
-  public Main(AuthService authService, Tools tools, AfterAccountEntryMenu afterAccountEntryMenu) {
+  public Main(AuthService authService, Tools tools, AccountMenu accountMenu) {
     this.authService = authService;
     this.tools = tools;
-    this.afterAccountEntryMenu = afterAccountEntryMenu;
+    this.accountMenu = accountMenu;
   }
 
   public Scanner in = new Scanner(System.in);
 
   public static void main(String[] args) throws IOException {
-    Main mainMenu = new Main(new AuthService(new FileService(), new Tools()), new Tools(), new AfterAccountEntryMenu());
+    Main mainMenu = new Main(
+      new AuthService(new FileService(), new Tools()), new Tools(),
+      new AccountMenu(new AuthService(new FileService(), new Tools()), new Tools(), new FileService()));
 
     mainMenu.showMainMenu();
   }
@@ -63,11 +65,15 @@ public class Main {
           return;
         }
 
-        Result regResult = authService.registration(new User(nickName, password));
+        User regUser = new User(nickName, password);
+
+        Result regResult = authService.registration(regUser);
         if (!regResult.isResult()) {
           System.out.println("User not added, reason: " + regResult.getError());
+          return;
         }
 
+        accountMenu.showLoginMenu(nickName);
         break;
       case ("sign in"):
         System.out.print("Enter your nickname: ");
@@ -78,9 +84,12 @@ public class Main {
         User user = new User(nickName, password);
         Result logResult = authService.login(user);
 
-        if (logResult.isResult()) afterAccountEntryMenu.showLoginMenu(user);
-        else System.out.println("Invalid login, reason: " + logResult.getError());
+        if (!logResult.isResult()) {
+          System.out.println("Invalid login, reason: " + logResult.getError());
+          return;
+        }
 
+        accountMenu.showLoginMenu(nickName);
         break;
       case ("exit"):
         System.exit(1);

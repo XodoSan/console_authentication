@@ -37,6 +37,11 @@ public class AuthService {
     return new Result(true, Error.NONE);
   }
 
+  public void changePassword(User user) throws IOException {
+    user.setPassword(tools.stringHashing(user.getPassword()));
+    fileService.replacePassword(user);
+  }
+
   private boolean isExist(String nickName) throws IOException {
     if (fileService.searchUserByNickName(nickName) != null) return true;
 
