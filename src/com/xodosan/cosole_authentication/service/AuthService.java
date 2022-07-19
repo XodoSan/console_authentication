@@ -30,6 +30,8 @@ public class AuthService {
     if (!isExist(user.getNickName())) return new Result(false, Error.USER_NOT_EXIST);
 
     User thisUser = fileService.searchUserByNickName(user.getNickName());
+    if (thisUser.isBanned()) return new Result(false, Error.BANNED_USER);
+
     if (!thisUser.getPassword().equals(tools.stringHashing(user.getPassword())))
       return new Result(false, Error.WRONG_PASSWORD);
     System.out.println("Successfully login!");
@@ -42,7 +44,7 @@ public class AuthService {
     fileService.replacePassword(user);
   }
 
-  private boolean isExist(String nickName) throws IOException {
+  public boolean isExist(String nickName) throws IOException {
     if (fileService.searchUserByNickName(nickName) != null) return true;
 
     return false;
