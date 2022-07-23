@@ -18,7 +18,6 @@ public class Main {
   private static AccountPage accountPage = new AccountPage();
   private static AuthService authService = new AuthService();
   private static UserService userService = new UserService();
-
   private static Scanner in = new Scanner(System.in);
   private static Console console = System.console();
 
@@ -27,20 +26,23 @@ public class Main {
   }
 
   public static void showMainMenu() {
-    if (!userService.file.exists()) {
-      userService.file.createNewFile();
-      userService.addUser(new User("Admin", Tools.stringHashing("")));
-    }
+    try {
+      if (!userService.file.exists()) {
+        userService.file.createNewFile();
+        userService.addUser(new User("Admin", Tools.stringHashing("")));
+      }
 
-    while (true) {
-      System.out.println("Registration - reg");
-      System.out.println("Login - log");
-      System.out.println("Exit - exit");
-      System.out.println("Please enter a command: ");
+      while (true) {
+        System.out.println("Registration - reg");
+        System.out.println("Login - log");
+        System.out.println("Exit - exit");
+        System.out.print("Please enter a command: ");
+        String command = in.nextLine();
 
-      String command = in.nextLine();
-
-      relocated(command);
+        relocated(command);
+      }
+    } catch (IOException e) {
+      // logger work
     }
   }
 
@@ -76,8 +78,8 @@ public class Main {
         System.out.print("Enter your nickname: ");
         String nickname = in.nextLine();
         String password = String.valueOf(console.readPassword("Enter your password: "));
-        User user = new User(nickname, password, false);
 
+        User user = new User(nickname, password, false);
         Result logResult = authService.login(user);
         if (!logResult.isResult()) {
           // System.out.println("Invalid login, reason: " + logResult.getError()); logger work

@@ -9,7 +9,7 @@ public class AuthService {
   UserService userService = new UserService();
 
   public Result registration(User user) {
-    if (userService.searchUserByNickname(user.getnickname()) != null) {
+    if (userService.findUserByNickname(user.getnickname()) != null) {
       return new Result(false, Error.USER_EXIST);
     }
 
@@ -21,11 +21,11 @@ public class AuthService {
   }
 
   public Result login(User user) {
-    if (userService.searchUserByNickname(user.getnickname()) == null) {
+    if (userService.findUserByNickname(user.getnickname()) == null) {
       return new Result(false, Error.USER_NOT_EXIST);
     }
 
-    User thisUser = userService.searchUserByNickname(user.getnickname());
+    User thisUser = userService.findUserByNickname(user.getnickname());
     if (thisUser.isBanned()) {
       return new Result(false, Error.BANNED_USER);
     }

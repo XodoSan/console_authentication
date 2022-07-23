@@ -22,10 +22,10 @@ public class AccountPage {
 
     while (status) {
       System.out.println("You in account: " + nickname);
-      System.out.println("Please enter a command");
       System.out.println("Change password - change");
       System.out.println("Sign out - out");
       System.out.println("Exit - exit");
+      System.out.print("Please enter a command: ");
 
       String command = in.nextLine();
 
@@ -34,19 +34,17 @@ public class AccountPage {
   }
 
   private void relocated(String command, String nickname) {
-    User thisUser = userService.searchUserByNickname(nickname);
+    User thisUser = userService.findUserByNickname(nickname);
 
     switch (command) {
-      case ("change"):
+      case ("change") -> {
         String oldPassword = String.valueOf(console.readPassword("Enter your old password: "));
-
         if (!thisUser.getPassword().equals(Tools.stringHashing(oldPassword))) {
           // System.out.println("Passwords not equal"); logger work
           return;
         }
 
         String newPassword = String.valueOf(console.readPassword("Enter your new password: "));
-
         Result validateResult = Tools.validatePassword(newPassword);
         if (!validateResult.isResult()) {
           // System.out.println(validateResult.getError()); logger work
@@ -54,15 +52,10 @@ public class AccountPage {
         }
 
         authService.updatePassword(new User(thisUser.getnickname(), newPassword));
-        break;
-      case ("out"):
-        status = false;
-        break;
-      case ("exit"):
-        System.exit(1);
-      default:
-        System.out.println(Error.UNEXPECTED_COMMAND);
-        break;
+      }
+      case ("out") -> status = false;
+      case ("exit") -> System.exit(1);
+      default -> System.out.println(Error.UNEXPECTED_COMMAND);
     }
   }
 }

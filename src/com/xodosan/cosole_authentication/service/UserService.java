@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class UserService {
-  public final File file = new File(Constants.DB_PATH);
+  public File file = new File(Constants.DB_PATH);
 
   public void addUser(User user) {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(Constants.DB_PATH, true))) {
@@ -43,7 +43,7 @@ public class UserService {
     rewriteFile(users);
   }
 
-  public User searchUserByNickname(String nickname) {
+  public User findUserByNickname(String nickname) {
     List<User> users = getAllUsers();
 
     for (User user : users) {
