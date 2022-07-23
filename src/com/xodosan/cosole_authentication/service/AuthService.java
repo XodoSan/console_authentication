@@ -1,52 +1,45 @@
 package com.xodosan.cosole_authentication.service;
 
-import com.xodosan.cosole_authentication.Error;
-import com.xodosan.cosole_authentication.Tools;
+import com.xodosan.cosole_authentication.constant.Error;
 import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
-
-import java.io.IOException;
+import com.xodosan.cosole_authentication.util.Tools;
 
 public class AuthService {
-  private FileService fileService;
-  private Tools tools;
+  UserService userService = new UserService();
 
-  public AuthService(FileService fileService, Tools tools) {
-    this.fileService = fileService;
-    this.tools = tools;
-  }
+  public Result registration(User user) {
+    if (userService.searchUserByNickname(user.getnickname()) != null) {
+      return new Result(false, Error.USER_EXIST);
+    }
 
-  public Result registration(User user) throws IOException {
-    if (isExist(user.getNickName())) return new Result(false, Error.USER_EXIST);
-
-    user.setPassword(tools.stringHashing(user.getPassword()));
-    fileService.writeToFile(user);
-    System.out.println("Successfully registration!");
+    user.setPassword(Tools.stringHashing(user.getPassword()));
+    userService.addUser(user);
+    // System.out.println("Successfully registration!"); logger work
 
     return new Result(true, Error.NONE);
   }
 
-  public Result login(User user) throws IOException {
-    if (!isExist(user.getNickName())) return new Result(false, Error.USER_NOT_EXIST);
+  public Result login(User user) {
+    if (userService.searchUserByNickname(user.getnickname()) == null) {
+      return new Result(false, Error.USER_NOT_EXIST);
+    }
 
-    User thisUser = fileService.searchUserByNickName(user.getNickName());
-    if (thisUser.isBanned()) return new Result(false, Error.BANNED_USER);
+    User thisUser = userService.searchUserByNickname(user.getnickname());
+    if (thisUser.isBanned()) {
+      return new Result(false, Error.BANNED_USER);
+    }
 
-    if (!thisUser.getPassword().equals(tools.stringHashing(user.getPassword())))
+    if (!thisUser.getPassword().equals(Tools.stringHashing(user.getPassword()))) {
       return new Result(false, Error.WRONG_PASSWORD);
-    System.out.println("Successfully login!");
+    }
+    // System.out.println("Successfully login!"); logger work
 
-    return new Result(true, Error.NONE);
+    return new Result(true, Error.NONE); // replace pojo result to boolean and logger error
   }
 
-  public void changePassword(User user) throws IOException {
-    user.setPassword(tools.stringHashing(user.getPassword()));
-    fileService.replacePassword(user);
-  }
-
-  public boolean isExist(String nickName) throws IOException {
-    if (fileService.searchUserByNickName(nickName) != null) return true;
-
-    return false;
+  public void updatePassword(User user) {
+    user.setPassword(Tools.stringHashing(user.getPassword()));
+    userService.updatePassword(user);
   }
 }

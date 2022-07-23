@@ -1,30 +1,16 @@
-package com.xodosan.cosole_authentication.menu;
+package com.xodosan.cosole_authentication.page;
 
-import com.xodosan.cosole_authentication.Constants;
-import com.xodosan.cosole_authentication.Error;
-import com.xodosan.cosole_authentication.Tools;
+import com.xodosan.cosole_authentication.constant.Constants;
+import com.xodosan.cosole_authentication.constant.Error;
 import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
-import com.xodosan.cosole_authentication.service.AuthService;
-import com.xodosan.cosole_authentication.service.FileService;
+import com.xodosan.cosole_authentication.util.Tools;
 
 import java.io.Console;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class AdminMenu {
-  private final AuthService authService;
-  private final FileService fileService;
-  private final Tools tools;
-  private final Constants constants;
-
-  public AdminMenu(AuthService authService, FileService fileService, Tools tools, Constants constants) {
-    this.authService = authService;
-    this.fileService = fileService;
-    this.tools = tools;
-    this.constants = constants;
-  }
-
+public class AdminPage {
   private Scanner in = new Scanner(System.in);
   private Console console = System.console();
   private boolean status;
@@ -45,33 +31,33 @@ public class AdminMenu {
     }
   }
 
-  private void relocated(String command) throws IOException {
-    User thisUser = fileService.searchUserByNickName(constants.adminNickName);
+  private void relocated(String command) {
+    User thisUser = userService.searchUserByNickname(Constants.ADMIN_nickname);
 
     switch (command) {
       case ("ban"):
         System.out.println("Enter user nickname: ");
-        String bannedUserNickName = in.nextLine();
+        String bannedUserNickname = in.nextLine();
 
-        if (!authService.isExist(bannedUserNickName)) {
+        if (!authService.isExist(bannedUserNickname)) {
           System.out.println(Error.USER_NOT_EXIST);
           break;
         }
 
-        if (bannedUserNickName.equals(constants.adminNickName)) {
+        if (bannedUserNickname.equals(Constants.ADMIN_nickname)) {
           System.out.println("Admin can't ban himself");
           break;
         }
 
-        User bannedUser = fileService.searchUserByNickName(bannedUserNickName);
+        User bannedUser = userService.searchUserByNickname(bannedUserNickname);
 
-        fileService.replaceBanStatus(bannedUser);
-        System.out.println("Successfully change ban status, user: " + bannedUserNickName);
+        userService.replaceBanStatus(bannedUser);
+        System.out.println("Successfully change ban status, user: " + bannedUserNickname);
         break;
       case ("change"):
         String oldPassword = String.valueOf(console.readPassword("Enter your old password: "));
 
-        Result compareResult = tools.isPasswordsEqual(tools.stringHashing(oldPassword), thisUser.getPassword());
+        Result compareResult = Tools.isPasswordsEqual(Tools.stringHashing(oldPassword), thisUser.getPassword());
         if (!compareResult.isResult()) {
           System.out.println(compareResult.getError());
           return;
@@ -79,13 +65,13 @@ public class AdminMenu {
 
         String newPassword = String.valueOf(console.readPassword("Enter your new password: "));
 
-        Result validateResult = tools.validatePassword(newPassword);
+        Result validateResult = Tools.validatePassword(newPassword);
         if (!validateResult.isResult()) {
           System.out.println(validateResult.getError());
           return;
         }
 
-        authService.changePassword(new User(thisUser.getNickName(), newPassword, thisUser.isBanned()));
+        authService.changePassword(new User(thisUser.getnickname(), newPassword));
         break;
       case ("out"):
         status = false;

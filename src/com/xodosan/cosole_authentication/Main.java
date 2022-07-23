@@ -1,56 +1,42 @@
 package com.xodosan.cosole_authentication;
 
-import com.xodosan.cosole_authentication.menu.AccountMenu;
-import com.xodosan.cosole_authentication.menu.AdminMenu;
+import com.xodosan.cosole_authentication.constant.Error;
+import com.xodosan.cosole_authentication.page.AccountPage;
+import com.xodosan.cosole_authentication.page.AdminPage;
 import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
-import com.xodosan.cosole_authentication.service.FileService;
+import com.xodosan.cosole_authentication.service.UserService;
+import com.xodosan.cosole_authentication.util.Tools;
 
 import java.io.Console;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-  private static AuthService authService;
-  private static Tools tools;
-  private static AccountMenu accountMenu;
-  private static FileService fileService;
-  private static AdminMenu adminMenu;
+  private static AdminPage adminPage = new AdminPage();
+  private static AccountPage accountPage = new AccountPage();
+  private static AuthService authService = new AuthService();
+  private static UserService userService = new UserService();
 
-  public Main(AuthService authService, Tools tools, AccountMenu accountMenu, FileService fileService, AdminMenu adminMenu) {
-    this.authService = authService;
-    this.tools = tools;
-    this.accountMenu = accountMenu;
-    this.fileService = fileService;
-    this.adminMenu = adminMenu;
+  private static Scanner in = new Scanner(System.in);
+  private static Console console = System.console();
+
+  public static void main(String[] args) {
+    showMainMenu();
   }
 
-  public Scanner in = new Scanner(System.in);
-  public Console console = System.console();
-
-  public static void main(String[] args) throws IOException {
-    Main mainMenu = new Main(
-      new AuthService(new FileService(new Constants()), new Tools()),
-      new Tools(),
-      new AccountMenu(new AuthService(new FileService(new Constants()), new Tools()), new Tools(), new FileService(new Constants())),
-      new FileService(new Constants()),
-      new AdminMenu(new AuthService(new FileService(new Constants()), new Tools()), new FileService(new Constants()), new Tools(), new Constants()));
-
-    mainMenu.showMainMenu();
-  }
-
-  public void showMainMenu() throws IOException {
-    if (!fileService.IsExists()) {
-      fileService.file.createNewFile();
-      fileService.writeToFile(new User("Admin", tools.stringHashing(""), false));
+  public static void showMainMenu() {
+    if (!userService.file.exists()) {
+      userService.file.createNewFile();
+      userService.addUser(new User("Admin", Tools.stringHashing("")));
     }
 
     while (true) {
-      System.out.println("Please enter a command");
-      System.out.println("Registration - sign up");
-      System.out.println("Login - sign in");
+      System.out.println("Registration - reg");
+      System.out.println("Login - log");
       System.out.println("Exit - exit");
+      System.out.println("Please enter a command: ");
 
       String command = in.nextLine();
 
@@ -58,61 +44,55 @@ public class Main {
     }
   }
 
-  private void relocated(String command) throws IOException {
+  private static void relocated(String command) {
     switch (command) {
-      case ("sign up"):
+      case "reg" -> {
         System.out.print("Enter your nickname: ");
-        String nickName = in.nextLine();
+        String nickname = in.nextLine();
+
         String password = String.valueOf(console.readPassword("Enter your password: "));
-        String repeatedPassword = String.valueOf(console.readPassword("Repeat your password: "));
-
-        Result compareResult = tools.isPasswordsEqual(password, repeatedPassword);
-        if (!compareResult.isResult()) {
-          System.out.println("User not added, reason: " + compareResult.getError());
-          return;
-        }
-
-        Result validateResult = tools.validatePassword(password);
+        Result validateResult = Tools.validatePassword(password);
         if (!validateResult.isResult()) {
-          System.out.println(validateResult.getError());
+          // System.out.println(validateResult.getError()); logger work
           return;
         }
 
-        User regUser = new User(nickName, password, false);
+        String repeatedPassword = String.valueOf(console.readPassword("Repeat your password: "));
+        if (!password.equals(repeatedPassword)) {
+          // System.out.println("User not added, reason: "); logger work
+          return;
+        }
 
+        User regUser = new User(nickname, password);
         Result regResult = authService.registration(regUser);
         if (!regResult.isResult()) {
-          System.out.println("User not added, reason: " + regResult.getError());
+          // System.out.println("User not added, reason: " + regResult.getError()); logger work
           return;
         }
 
-        accountMenu.showLoginMenu(nickName);
-        break;
-      case ("sign in"):
+        accountPage.showLoginMenu(nickname);
+      }
+      case "log" -> {
         System.out.print("Enter your nickname: ");
-        nickName = in.nextLine();
-        password = String.valueOf(console.readPassword("Enter your password: "));
+        String nickname = in.nextLine();
+        String password = String.valueOf(console.readPassword("Enter your password: "));
+        User user = new User(nickname, password, false);
 
-        User user = new User(nickName, password, false);
         Result logResult = authService.login(user);
-
         if (!logResult.isResult()) {
-          System.out.println("Invalid login, reason: " + logResult.getError());
+          // System.out.println("Invalid login, reason: " + logResult.getError()); logger work
           return;
         }
 
-        if (user.getNickName().equals("Admin")) {
-          adminMenu.showAdminMenu();
+        if (user.getnickname().equals("Admin")) {
+          adminPage.showAdminMenu();
           break;
         }
 
-        accountMenu.showLoginMenu(nickName);
-        break;
-      case ("exit"):
-        System.exit(1);
-      default:
-        System.out.println(Error.UNEXPECTED_COMMAND);
-        break;
+        accountPage.showLoginMenu(nickname);
+      }
+      case "exit" -> System.exit(1);
+      default -> System.out.println(Error.UNEXPECTED_COMMAND);
     }
   }
 }

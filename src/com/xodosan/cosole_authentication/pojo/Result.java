@@ -1,6 +1,6 @@
 package com.xodosan.cosole_authentication.pojo;
 
-import com.xodosan.cosole_authentication.Error;
+import com.xodosan.cosole_authentication.constant.Error;
 
 public class Result {
   private boolean result;

@@ -1,18 +1,27 @@
 package com.xodosan.cosole_authentication.pojo;
 
 public class User {
-  private String nickName;
+  private String nickname;
   private String password;
   private boolean isBanned;
 
-  public User(String nickName, String password, boolean isBanned) {
-    this.nickName = nickName;
+  public User(String nickname, String password) {
+    this.nickname = nickname;
     this.password = password;
+  }
+
+  public User(String nickname, String password, boolean isBanned) {
+    this(nickname, password);
     this.isBanned = isBanned;
   }
 
-  public String getNickName() {
-    return nickName;
+  @Override
+  public String toString() {
+    return nickname + ' ' + password + ' ' + isBanned + '\n';
+  }
+
+  public String getnickname() {
+    return nickname;
   }
 
   public String getPassword() {
@@ -23,8 +32,8 @@ public class User {
     return isBanned;
   }
 
-  public void setNickName(String nickName) {
-    this.nickName = nickName;
+  public void setnickname(String nickname) {
+    this.nickname = nickname;
   }
 
   public void setPassword(String password) {

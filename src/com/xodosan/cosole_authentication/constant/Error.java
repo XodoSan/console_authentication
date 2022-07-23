@@ -1,4 +1,4 @@
-package com.xodosan.cosole_authentication;
+package com.xodosan.cosole_authentication.constant;
 
 public enum Error {
   NONE,
