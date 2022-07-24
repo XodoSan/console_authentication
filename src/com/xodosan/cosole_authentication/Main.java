@@ -3,7 +3,6 @@ package com.xodosan.cosole_authentication;
 import com.xodosan.cosole_authentication.constant.Error;
 import com.xodosan.cosole_authentication.page.AccountPage;
 import com.xodosan.cosole_authentication.page.AdminPage;
-import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
 import com.xodosan.cosole_authentication.service.UserService;

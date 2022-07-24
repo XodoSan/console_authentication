@@ -1,10 +1,10 @@
 package com.xodosan.cosole_authentication.page;
 
 import com.xodosan.cosole_authentication.constant.Error;
-import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
 import com.xodosan.cosole_authentication.service.UserService;
+import com.xodosan.cosole_authentication.util.Logger;
 import com.xodosan.cosole_authentication.util.Tools;
 
 import java.io.Console;
@@ -26,7 +26,6 @@ public class AccountPage {
       System.out.println("Sign out - out");
       System.out.println("Exit - exit");
       System.out.print("Please enter a command: ");
-
       String command = in.nextLine();
 
       relocated(command, nickname);
@@ -40,14 +39,14 @@ public class AccountPage {
       case ("change") -> {
         String oldPassword = String.valueOf(console.readPassword("Enter your old password: "));
         if (!thisUser.getPassword().equals(Tools.stringHashing(oldPassword))) {
-          // System.out.println("Passwords not equal"); logger work
+          Logger.DisplayMessageByError(Error.PASSWORDS_NOT_EQUAL);
           return;
         }
 
         String newPassword = String.valueOf(console.readPassword("Enter your new password: "));
-        Result validateResult = Tools.validatePassword(newPassword);
-        if (!validateResult.isResult()) {
-          // System.out.println(validateResult.getError()); logger work
+        Error validateResult = Tools.validatePassword(newPassword);
+        if (validateResult != Error.NONE) {
+          Logger.DisplayMessageByError(validateResult);
           return;
         }
 
@@ -55,7 +54,7 @@ public class AccountPage {
       }
       case ("out") -> status = false;
       case ("exit") -> System.exit(1);
-      default -> System.out.println(Error.UNEXPECTED_COMMAND);
+      default -> Logger.DisplayMessageByError(Error.UNEXPECTED_COMMAND);
     }
   }
 }

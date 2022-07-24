@@ -1,7 +1,6 @@
 package com.xodosan.cosole_authentication.service;
 
 import com.xodosan.cosole_authentication.constant.Error;
-import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.util.Tools;
 

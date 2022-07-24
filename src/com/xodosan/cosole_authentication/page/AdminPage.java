@@ -2,10 +2,10 @@ package com.xodosan.cosole_authentication.page;
 
 import com.xodosan.cosole_authentication.constant.Constants;
 import com.xodosan.cosole_authentication.constant.Error;
-import com.xodosan.cosole_authentication.pojo.Result;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
 import com.xodosan.cosole_authentication.service.UserService;
+import com.xodosan.cosole_authentication.util.Logger;
 import com.xodosan.cosole_authentication.util.Tools;
 
 import java.io.Console;
@@ -43,30 +43,30 @@ public class AdminPage {
         String bannedUserNickname = in.nextLine();
 
         if (userService.findUserByNickname(bannedUserNickname) == null) {
-          // System.out.println(Error.USER_NOT_EXIST); logger work
+          Logger.DisplayMessageByError(Error.USER_NOT_EXIST);
           break;
         }
 
         if (bannedUserNickname.equals(Constants.ADMIN_NICKNAME)) {
-          // System.out.println("Admin can't ban himself"); logger work
+          Logger.DisplayMessageByError(Error.SELF_BAN);
           break;
         }
 
         User bannedUser = userService.findUserByNickname(bannedUserNickname);
         userService.updateBanStatus(bannedUser);
-        // System.out.println("Successfully change ban status, user: " + bannedUserNickname); logger work
+        // System.out.println("Successfully change ban status, user: " + bannedUserNickname);
       }
       case ("change") -> {
         String oldPassword = String.valueOf(console.readPassword("Enter your old password: "));
         if (!Tools.stringHashing(oldPassword).equals(thisUser.getPassword())) {
-          // System.out.println(Some error); logger work
+          Logger.DisplayMessageByError(Error.WRONG_PASSWORD);
           return;
         }
 
         String newPassword = String.valueOf(console.readPassword("Enter your new password: "));
-        Result validateResult = Tools.validatePassword(newPassword);
-        if (!validateResult.isResult()) {
-          System.out.println(validateResult.getError());
+        Error validateResult = Tools.validatePassword(newPassword);
+        if (validateResult != Error.NONE) {
+          Logger.DisplayMessageByError(validateResult);
           return;
         }
 
@@ -74,7 +74,7 @@ public class AdminPage {
       }
       case ("out") -> status = false;
       case ("exit") -> System.exit(1);
-      default -> System.out.println(Error.UNEXPECTED_COMMAND);
+      default -> Logger.DisplayMessageByError(Error.UNEXPECTED_COMMAND);
     }
   }
 }
