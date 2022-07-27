@@ -6,6 +6,7 @@ import com.xodosan.cosole_authentication.page.AdminPage;
 import com.xodosan.cosole_authentication.pojo.User;
 import com.xodosan.cosole_authentication.service.AuthService;
 import com.xodosan.cosole_authentication.service.UserService;
+import com.xodosan.cosole_authentication.util.Logger;
 import com.xodosan.cosole_authentication.util.Tools;
 
 import java.io.Console;
@@ -17,6 +18,7 @@ public class Main {
   private static AccountPage accountPage = new AccountPage();
   private static AuthService authService = new AuthService();
   private static UserService userService = new UserService();
+  private static Logger logger = new Logger();
   private static Scanner in = new Scanner(System.in);
   private static Console console = System.console();
 
@@ -41,7 +43,7 @@ public class Main {
         relocated(command);
       }
     } catch (IOException e) {
-      // logger work
+      System.out.println("File not found");
     }
   }
 
@@ -52,25 +54,25 @@ public class Main {
         String nickname = in.nextLine();
 
         String password = String.valueOf(console.readPassword("Enter your password: "));
-        Result validateResult = Tools.validatePassword(password);
-        if (!validateResult.isResult()) {
-          // System.out.println(validateResult.getError()); logger work
+        Error validateResult = Tools.validatePassword(password);
+        if (validateResult != Error.NONE) {
+          Logger.DisplayMessageByError(validateResult);
           return;
         }
 
         String repeatedPassword = String.valueOf(console.readPassword("Repeat your password: "));
         if (!password.equals(repeatedPassword)) {
-          // System.out.println("User not added, reason: "); logger work
+          Logger.DisplayMessageByError(Error.PASSWORDS_NOT_EQUAL);
           return;
         }
 
         User regUser = new User(nickname, password);
-        Result regResult = authService.registration(regUser);
-        if (!regResult.isResult()) {
-          // System.out.println("User not added, reason: " + regResult.getError()); logger work
+        if (!authService.registration(regUser)) {
+          Logger.DisplayMessageByError(Error.USER_EXIST);
           return;
         }
 
+        System.out.println("Successfully registration");
         accountPage.showLoginMenu(nickname);
       }
       case "log" -> {
@@ -78,10 +80,10 @@ public class Main {
         String nickname = in.nextLine();
         String password = String.valueOf(console.readPassword("Enter your password: "));
 
-        User user = new User(nickname, password, false);
-        Result logResult = authService.login(user);
-        if (!logResult.isResult()) {
-          // System.out.println("Invalid login, reason: " + logResult.getError()); logger work
+        User user = new User(nickname, password);
+        Error logResult = authService.login(user);
+        if (logResult != Error.NONE) {
+          Logger.DisplayMessageByError(logResult);
           return;
         }
 
@@ -90,10 +92,11 @@ public class Main {
           break;
         }
 
+        System.out.println("Successfully login");
         accountPage.showLoginMenu(nickname);
       }
       case "exit" -> System.exit(1);
-      default -> System.out.println(Error.UNEXPECTED_COMMAND);
+      default -> Logger.DisplayMessageByError(Error.UNEXPECTED_COMMAND);
     }
   }
 }

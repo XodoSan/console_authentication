@@ -27,7 +27,6 @@ public class AdminPage {
       System.out.println("Change your password - change");
       System.out.println("Sign out - out");
       System.out.println("Exit - exit");
-
       String command = in.nextLine();
 
       relocated(command);
@@ -54,7 +53,7 @@ public class AdminPage {
 
         User bannedUser = userService.findUserByNickname(bannedUserNickname);
         userService.updateBanStatus(bannedUser);
-        // System.out.println("Successfully change ban status, user: " + bannedUserNickname);
+        System.out.println("Successfully change ban status, user: " + bannedUserNickname);
       }
       case ("change") -> {
         String oldPassword = String.valueOf(console.readPassword("Enter your old password: "));
